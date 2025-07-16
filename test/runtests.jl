@@ -87,7 +87,7 @@ function get_all_xml_dates(inputpath,testpath)
     end
     all_xml_names = get_all_xml_subdir(inputpath)
     all_xml_dates = find_all_xml_dates(all_xml_names)
-    years = [split(date,"_")[1] for date in all_xml_dates]
+    years = [split(date,"-")[1] for date in all_xml_dates]
     open("all_xml_dates.csv", "w") do io
         for (x,y) in zip(years, all_xml_dates)
             println(io, "$x,$y")

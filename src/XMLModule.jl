@@ -25,11 +25,12 @@ end
 end
 
 
-function clean_quotes(s)
-    single_quote_count = count(c -> c == '\'', s)
-    double_quote_count = count(c -> c == '"', s)
-    s = replace(s, '\'' => "")
-    s = replace(s, '"' => "")
+function pair_quotes(s)
+#    s = replace(s, "'" => '\"')
+#    single_quote_count = count(c -> c == '\'', s)
+#    double_quote_count = count(c -> c == '"', s)
+#    s = replace(s, '\'' => "")
+#    s = replace(s, '"' => "")
     return s
 end
 
@@ -38,7 +39,7 @@ end
     filtered_str = replace(str, "\n" => "")
 #    filtered_str = replace.(str, r"^[ \.]?-+" => "")
     # Replace multiple spaces with a single space, excluding spaces between words
-    filtered_str = clean_quotes(replace(filtered_str, r"\s+" => " "))
+    filtered_str = pair_quotes(replace(filtered_str, r"\s+" => " "))
     if all(isspace, filtered_str)
         return "N/A"
     else

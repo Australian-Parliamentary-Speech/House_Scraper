@@ -65,9 +65,16 @@ Inputs:
 function run_ParlinfoSpeechScraper(toml::Dict{String, Any})
     global_options = toml["GLOBAL"]
     general_options = toml["GENERAL_OPTIONS"]
+
     input_path = global_options["INPUT_PATH"]
     output_path = global_options["OUTPUT_PATH"] 
     year_range = general_options["YEAR"]
+    which_house = general_options["WHICH_HOUSE"]
+    csv_exist = general_options["CSV_EXIST"]
+    edit_funcs = general_options["EDIT"]
+    over_write = general_options["OVERWRITE"]
+    sample_write = general_options["SAMPLE"]
+
     xml_paths = [] 
 
     # Get single xml path
@@ -96,21 +103,16 @@ function run_ParlinfoSpeechScraper(toml::Dict{String, Any})
             end
         end
     end
-    csv_exist = toml["GENERAL_OPTIONS"]["CSV_EXIST"]
-    edit_funcs = toml["GENERAL_OPTIONS"]["EDIT"]
-    over_write = toml["GENERAL_OPTIONS"]["OVERWRITE"]
-    sample_write = toml["GENERAL_OPTIONS"]["SAMPLE"]
-
     Threads.@threads for (year,fn) in xml_paths
         output_path_ = joinpath(output_path,"$year")
         date_float,date = get_date(fn)
         outputcsv = joinpath(output_path_,"$date.csv")
         if !(isfile(outputcsv))
             create_dir(output_path_)
-            run_xml(fn,output_path_,csv_exist,edit_funcs)
+            run_xml(fn,output_path_,csv_exist,edit_funcs,which_house)
         else
             if over_write
-                run_xml(fn,output_path_,csv_exist,edit_funcs)
+                run_xml(fn,output_path_,csv_exist,edit_funcs,which_house)
             end 
         end
    end
@@ -170,7 +172,7 @@ Inputs:
 - `csv_exist`: Boolean flag indicating if a CSV file already exists.
 - `edit_funcs`: list of edit functions
 """
-function run_xml(fn,output_path,csv_exist,edit_funcs)
+function run_xml(fn,output_path,csv_exist,edit_funcs,which_house)
     error_files = []
     xdoc = nothing
     try
@@ -183,7 +185,7 @@ function run_xml(fn,output_path,csv_exist,edit_funcs)
     soup = root(xdoc)
     date_float,date = get_date(fn)
     @show date
-    PhaseType = detect_phase(date_float)
+    PhaseType = detect_phase(date_float,which_house)
     outputcsv = joinpath(output_path,"$date.csv")
     if !(csv_exist) 
         open(outputcsv, "w") do io

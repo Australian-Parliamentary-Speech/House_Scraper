@@ -1,5 +1,6 @@
 [GENERAL_OPTIONS]
 YEAR = [1901, 2025]
+WHICH_HOUSE = "house"
 OVERWRITE = true
 SAMPLE = true
 CSV_EXIST = false
@@ -13,9 +14,9 @@ LOGGING = true
 OUTPUT_PATH = "/home/eve/Development/ParlinfoSpeechScraper/HouseCSV/hansard"
 
 [METADATA]
-TIME = "16:26:15"
+TIME = "11:03:36"
 ORIGINAL = "/home/eve/Development/ParlinfoSpeechScraper/Inputs/hansard/hansard.toml"
-DATE = "2025-07-14"
+DATE = "2025-07-16"
 
 [[XML_DIR]]
 PATH = "xmls"

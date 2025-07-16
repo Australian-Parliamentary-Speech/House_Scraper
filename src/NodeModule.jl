@@ -47,6 +47,8 @@ end
 # Included phases can add to this dictionary
 date_to_phase = Dict()
 
+date_to_phase_senate = Dict()
+
 # Included phases can add to this dictionary
 range_to_phase = Dict()
 
@@ -60,6 +62,31 @@ for dir in readdir(phase_path, join=true)
     end
 end
 
+function detect_phase(date,which_house)
+    if which_house == "senate"
+        phase = detect_phase_senate(date)        
+    elseif which_house == "house"
+        phase = detect_phase_house(date)
+    else
+        @error "which_house is not correctly given"
+    end
+end
+
+function detect_phase_senate(date)
+    phase = get(date_to_house_senate, date, nothing)
+    if ! isnothing(phase)
+        return phase
+    end
+    for (date_range,phase) in date_to_phase_senate
+        min_date, max_date = date_range
+        if min_date <= date <= max_date
+            return phase
+        end
+    end
+    if isnothing(phase)
+        return detect_phase_house(date)
+    end
+end
 
 """
 detect_phase(date)
@@ -70,7 +97,7 @@ Inputs:
 Returns:
 - The phase associated with the provided `date`, or `AbstractPhase` if no specific phase is found.
 """
-function detect_phase(date)
+function detect_phase_house(date)
     # See if year has specific phase
     phase = get(date_to_phase, date, nothing)
     if ! isnothing(phase)

@@ -1,6 +1,5 @@
 Inputs/**/*.xml
 HouseCSV/hansard/**/*.csv
-HouseCSV/saved_hansard/**/*.csv
 HouseCSV/**/*.sh
 **/*.png
 **/*.pdf

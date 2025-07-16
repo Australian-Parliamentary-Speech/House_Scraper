@@ -10,6 +10,7 @@
     path = "xmls"
 
 [ general_options ]
+    which_house = "house"
     csv_exist = false
     edit = ["re","free_node","flatten","flatten","column_decorate"]
     year = [1901,2025]
