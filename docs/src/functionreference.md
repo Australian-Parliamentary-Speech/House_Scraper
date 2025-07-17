@@ -34,10 +34,6 @@ CurrentModule = ParlinfoSpeechScraper.RunModule.NodeModule
 ```
 
 ```@docs
-detect_phase(date)
-```
-
-```@docs
 get_all_subtypes(type,st=())
 ```
 
