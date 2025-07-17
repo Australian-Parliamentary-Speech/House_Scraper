@@ -32,6 +32,22 @@ function get_sample_csvs(outputpath,gold_standard_csvs,sample_dir)
 end
 
 
+
+function similarity_ratio(gold_standard_csvs,sample_csv_path, testpath)
+    fn = joinpath(testpath,"similarity_test.csv")
+    open(fn,"w") do io
+        for gs_csv in gold_standard_csvs
+            gs_name = basename(gs_csv)
+
+            sample_csv = joinpath(sample_csv_path,gs_name)
+            ratio = similarity_csv(gs_csv,sample_csv)
+            @show ratio
+            println(io,"\"$gs_name\",ratio")
+        end
+    end
+end
+
+
 function compare_outputs(gold_standard_csvs,sample_csv_path,testpath)
     fn = joinpath(testpath,"compatibility_test.csv")
     open(fn,"w") do io
@@ -44,13 +60,17 @@ function compare_outputs(gold_standard_csvs,sample_csv_path,testpath)
     end
 end
 
-function compare_gold_standard(outputpath, testpath)
+function compare_gold_standard(outputpath, testpath,which_test)
     gold_standard_path = joinpath(testpath,"gold_standard")
     sample_csv_path = joinpath(testpath,"sample_csv")
     create_dir(sample_csv_path)
     gold_standard_csvs = get_all_csvnames(gold_standard_path)
     get_sample_csvs(outputpath,gold_standard_csvs,sample_csv_path)
-    compare_outputs(gold_standard_csvs, sample_csv_path,testpath)
+    if which_test == :debug
+        compare_outputs(gold_standard_csvs, sample_csv_path,testpath)
+    elseif which_test == :ratio
+        similarity_ratio(gold_standard_csvs,sample_csv_path, testpath) 
+    end
 end
 
 
@@ -99,26 +119,26 @@ end
 
 @testset verbose = true "Test set" begin
     inputpath, outputpath = setup()
-#    @test begin
-#        compare_gold_standard(outputpath, @__DIR__)
-#        true
-#    end
-
     @test begin
-        get_all_csv_dates(outputpath,@__DIR__)
-        get_all_xml_dates(inputpath,@__DIR__)
-
-        xml = CSV.read("all_xml_dates.csv", DataFrame)
-        csv = CSV.read("all_csv_dates.csv", DataFrame)
-
-        xmls = xml[:, 2]
-        csvs = csv[:, 2]
-        only_in_xml = setdiff(xmls, csvs)
-        only_in_csv = setdiff(csvs, xmls)
-        @show only_in_xml
-        @show only_in_csv
+        compare_gold_standard(outputpath, @__DIR__,[:debug,:ratio][2])
         true
     end
+
+#    @test begin
+#        get_all_csv_dates(outputpath,@__DIR__)
+#        get_all_xml_dates(inputpath,@__DIR__)
+#
+#        xml = CSV.read("all_xml_dates.csv", DataFrame)
+#        csv = CSV.read("all_csv_dates.csv", DataFrame)
+#
+#        xmls = xml[:, 2]
+#        csvs = csv[:, 2]
+#        only_in_xml = setdiff(xmls, csvs)
+#        only_in_csv = setdiff(csvs, xmls)
+#        @show only_in_xml
+#        @show only_in_csv
+#        true
+#    end
 end
  
 

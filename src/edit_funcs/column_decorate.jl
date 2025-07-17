@@ -8,23 +8,24 @@ function column_decorate(input_fn, output_fn, ::Type{<:AbstractEditPhase})
     row_index = 1
 
     new_header_to_num, new_headers = add_header(num_to_header)
-    speaker_num = 0
+    speaker_num = 1
 
     open(output_fn,"w") do io
         write_row_to_io(io,string.(new_headers))
         for row in rows
+            if row_index > 1
+                row_dict,speaker_num = input_speaker_number(rows,row_dict, row_index,speaker_num,header_to_num)
+            else
+                row_dict[:speaker_no] = speaker_num 
+            end
+
             row_dict = Dict()
             if is_stage_direction(row,header_to_num)
 
                 row_dict[:stage_direction_flag] = 1
-                row_dict[:speaker_no] = "N/A"
             else
                 row_dict[:stage_direction_flag] = 0
                 speaker_num += 1
-                row_dict[:speaker_no] = speaker_num
-                if row_index > 1
-                    row_dict,speaker_num = input_speaker_number(rows,row_dict, row_index,speaker_num,header_to_num)
-                end
             end
             row_ = @. collect(row)
             row = row_[1]
@@ -52,11 +53,15 @@ function input_speaker_number(rows,row_dict,row_index, speaker_num,header_to_num
 end
 
 function same_speaker(current_row,prev_row,header_to_num)
-    prev_debate, prev_subdebate = prev_row[header_to_num[:debateinfo]],prev_row[header_to_num[:subdebateinfo]]
-    current_debate, current_subdebate = current_row[header_to_num[:debateinfo]],current_row[header_to_num[:subdebateinfo]]
-    current_speaker = current_row[header_to_num[:name]]
-    prev_speaker = prev_row[header_to_num[:name]]
-    return current_speaker == prev_speaker && current_debate == prev_debate && current_subdebate == prev_subdebate
+   current_speaker = current_row[header_to_num[:name]]
+    if current_speaker == "N/A"
+        return false
+    else
+        prev_debate, prev_subdebate = prev_row[header_to_num[:debateinfo]],prev_row[header_to_num[:subdebateinfo]]
+        current_debate, current_subdebate = current_row[header_to_num[:debateinfo]],current_row[header_to_num[:subdebateinfo]] 
+        prev_speaker = prev_row[header_to_num[:name]]
+        return current_speaker == prev_speaker && current_debate == prev_debate && current_subdebate == prev_subdebate
+    end
 end
 
 function add_header(num_to_header)
